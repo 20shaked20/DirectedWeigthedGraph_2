@@ -1,9 +1,8 @@
 import json
+import sys
 from collections import deque
-
 from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
-from Ex3.src.data.Project.Node import Node
 from typing import List
 
 INF = float("inf")
@@ -155,6 +154,28 @@ class GraphAlgo:
         Finds the node that has the shortest distance to it's farthest node.
         :return: The nodes id, min-maximum distance
         """
+        min1 = sys.float_info.max
+        node_id = -1
+        for k in self.get_graph().get_all_v():
+            curr_node = k
+            max1 = sys.float_info.min
+            for v in self.get_graph().get_all_v():
+                if v == k:  # same node, no need to check again.
+                    continue
+                next_node = v
+                tmp_dijk = self.shortest_path(curr_node, next_node)
+                tmp = tmp_dijk[1]
+                if tmp_dijk[0] is not INF:
+                    if tmp > max1:
+                        max1 = tmp
+                    if tmp > min1:  # in case there's a bigger dist break, because we don't want that -> Minimum of all maximum
+                        break
+
+            if min1 > max1:
+                min1 = max1
+                node_id = k
+
+        return node_id, min1
 
     def plot_graph(self) -> None:
         """
@@ -170,7 +191,8 @@ if __name__ == '__main__':
     nodes = {}
     tmp = DiGraph(nodes)
     g = GraphAlgo(tmp)
-    g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json")
+    g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/1000Nodes.json")
     # print(g.get_graph().all_out_edges_of_node(0))
-    print(g.get_graph().all_out_edges_of_node(0)[10])
-    print(g.shortest_path(0, 0))
+    # print(g.get_graph().all_out_edges_of_node(0)[5])
+    print(g.shortest_path(0, 6))
+    print(g.centerPoint())

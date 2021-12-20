@@ -11,7 +11,9 @@ class TestGraphAlgo(TestCase):
     def setUp(self) -> None:
         nodes = {}
         g = DiGraph(nodes)
+        path = "/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json"
         self.graph_algo = GraphAlgo(g)
+        self.graph_algo.load_from_json(path)
 
     def test_get_graph(self):
         tmp_DiGraph = self.graph_algo.get_graph()
@@ -32,7 +34,7 @@ class TestGraphAlgo(TestCase):
         self.fail()
 
     def test_center_point(self):
-        self.fail()
+        print(self.graph_algo.centerPoint())
 
     def test_plot_graph(self):
         self.fail()
