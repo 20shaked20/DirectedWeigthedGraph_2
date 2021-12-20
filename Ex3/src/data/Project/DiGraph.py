@@ -69,10 +69,17 @@ class DiGraph:
         @return: True if the edge was added successfully, False o.w.
         Note: If the edge already exists or one of the nodes dose not exists the functions will do nothing
         """
-        if id1 in self.nodes and id2 in self.nodes:  # Both nodes exist
-            self.nodes.get(id1).add_edge_out(weight)  # connects out id1 ----> id2
-            self.nodes.get(id2).add_edge_in(weight)  # connects in id1 ----> id2
-        return False
+        if self.nodes.get(id1) is None or self.nodes.get(id2) is None:  # one of nodes are not available at all
+            return False
+        if id2 in self.nodes.get(id1).all_edges_out_dict().keys():  # edge exist
+            return False
+        if id1 == id2:  # same id cannot have own edge
+            return False
+        self.nodes.get(id1).add_edge_out(id2, weight)
+        self.nodes.get(id2).add_edge_in(id1, weight)
+        self.edges_size += 1
+        self.MC += 1
+        return True
 
     def add_node(self, node_id: int, pos: tuple = None) -> bool:
         """
@@ -91,19 +98,26 @@ class DiGraph:
 
     def remove_node(self, node_id: int) -> bool:
         """
+        TODO: make this work.
         Removes a node from the graph.
         @param node_id: The node ID
         @return: True if the node was removed successfully, False o.w.
         Note: if the node id does not exists the function will do nothing
         """
-        raise NotImplementedError
+        if node_id not in self.nodes:  # node does not exist case.
+            return False
+        pass
 
     def remove_edge(self, node_id1: int, node_id2: int) -> bool:
         """
+        TODO: make this work.
         Removes an edge from the graph.
         @param node_id1: The start node of the edge
         @param node_id2: The end node of the edge
         @return: True if the edge was removed successfully, False o.w.
         Note: If such an edge does not exists the function will do nothing
         """
-        raise NotImplementedError
+        if node_id1 == node_id2:  # same id cant add that edge at all.
+            return False
+        if node_id1 in self.nodes.get(node_id1).all_edges_out_dict().keys():  # if edge exists
+            pass

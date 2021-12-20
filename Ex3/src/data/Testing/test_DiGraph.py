@@ -24,7 +24,6 @@ class TestDiGraph(TestCase):
         tmp_dict = {0: (35.18753053591606, 32.10378225882353, 0.0),
                     1: (35.18958953510896, 32.10785303529412, 0.0),
                     2: (35.19341035835351, 32.10610841680672, 0.0)}
-        print(self.g.get_all_v())
         self.assertEqual(self.g.get_all_v(), tmp_dict)
 
     def test_all_in_edges_of_node(self):
@@ -47,7 +46,10 @@ class TestDiGraph(TestCase):
         self.assertEqual(self.g.get_mc(), 0)
 
     def test_add_edge(self):
-        self.fail()
+        self.assertEqual(self.g.add_edge(0, 1, weight=6), True)
+        self.assertEqual(self.g.add_edge(1, 0, weight=5.5), True)
+        self.assertEqual(self.g.add_edge(1, 1, weight=5.5), False)
+        self.assertEqual(self.g.add_edge(0, 1, weight=6.5), False)  # Checking we cant add an edge that exists.
 
     def test_add_node(self):
         tmp_dict = {0: (35.18753053591606, 32.10378225882353, 0.0),
