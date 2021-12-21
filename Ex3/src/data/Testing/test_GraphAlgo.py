@@ -28,7 +28,10 @@ class TestGraphAlgo(TestCase):
         self.assertEqual(self.graph_algo.load_from_json("bla"), False)
 
     def test_save_to_json(self):
-        self.fail()
+        # file_loc = "/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json"
+        file_loc = "C:/Users/yonar/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json"
+        self.graph_algo.load_from_json(file_loc)
+        self.graph_algo.save_to_json("test_save")
 
     def test_shortest_path(self):
         self.fail()

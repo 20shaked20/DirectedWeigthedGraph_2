@@ -2,7 +2,7 @@ import json
 import math
 import random
 import sys
-import time
+# import time
 from collections import deque
 from typing import List
 
@@ -119,7 +119,7 @@ def cooling_schedule(start_temp, cooling_const):
 def SA(number_of_cities, cost_function, MEB, seed):
     """
     This function implements a Simulated Annealing algorithm for TSP
-    :param number_of_cities: self explanatory
+    :param number_of_cities: self-explanatory
     :param cost_function: which cost function to use ( 1 or 2 or 3 )
     :param MEB: Total number of evaluations allowed ( essentially, a limit on how much computational strength to use )
     :param seed: a seed for the random_path() generator
@@ -220,7 +220,49 @@ class GraphAlgo:
         @param file_name: The path to the out file
         @return: True if the save was successful, False o.w.
         """
-        raise NotImplementedError
+        data = {"Edges": [], "Nodes": []}
+        all_nodes = self.get_graph().get_all_v()
+        for node in all_nodes:
+            # key_list = list(all_nodes.keys())
+            val_list = list(all_nodes.values())
+            data["Nodes"].append({
+                'pos': val_list[node],
+                'id': node
+            })
+            # Iterate once over OUT-going edges
+            edges = self.get_graph().all_out_edges_of_node(node)
+            # key_list = list(edges.keys())
+            val_list = list(edges.values())
+            for edge in edges:
+                if not (edge in data["Edges"]):  # TODO: is this the correct check?
+                    data["Edges"].append({
+                        'src': node,
+                        'w': val_list[edge],  # TODO: fix this line
+                        'dest': edge
+                    })
+
+            # Then iterate once over IN-going edges
+            edges = self.get_graph().all_in_edges_of_node(node)
+            # key_list = list(edges.keys())
+            val_list = list(edges.values())
+            for edge in edges:
+                if not (edge in data["Edges"]):  # TODO: duplicate, is this the correct check?
+                    data["Edges"].append({
+                        'src': node,
+                        'w': val_list[edge],  # TODO: fix this line
+                        'dest': edge
+                    })
+        with open(file_name, "wx"):
+            json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+        """
+        Explanation on values passed to json.dumps():
+        indent = 4  -  activates pretty print if an integer is passed
+        sort_keys = True  -  sorts the json 
+        ensure_ascii = False  -  does not escape unicode characters to match ASCII 
+        ( for example 'cost':'£4.00' becomes --> "cost": "\u00a34.00" if ensure_ascii=True )
+        """
+
+        # raise NotImplementedError
 
     def shortest_path(self, id1: int, id2: int) -> (float, list):
         """

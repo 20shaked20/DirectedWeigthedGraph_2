@@ -14,8 +14,8 @@ class DiGraph:
         """
         self.nodes = nodes
         self.MC = 0
-        self.node_size = len(nodes)  # how many nodes are in the graph.
-        self.edges_size = 0  # right now there are 0 edges, only nodes.
+        self.node_size = len(nodes)
+        self.edges_size = 0  # adding edges later, so it's set to 0
 
     def v_size(self) -> int:
         """
