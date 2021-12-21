@@ -117,7 +117,7 @@ class DiGraph:
         @return: True if the edge was removed successfully, False o.w.
         Note: If such an edge does not exists the function will do nothing
         """
-        if node_id1 == node_id2:  # same id cant add that edge at all.
+        if node_id1 == node_id2:  # same id can't add that edge at all.
             return False
         if node_id1 in self.nodes.get(node_id1).all_edges_out_dict().keys():  # if edge exists
             pass

@@ -1,11 +1,170 @@
 import json
+import math
+import random
 import sys
+import time
 from collections import deque
-from Ex3.src.GraphInterface import GraphInterface
-from Ex3.src.data.Project.DiGraph import DiGraph
 from typing import List
 
+from Ex3.src.GraphInterface import GraphInterface
+from Ex3.src.data.Project.DiGraph import DiGraph
+
 INF = float("inf")
+
+
+# START of TSP helper functions
+def cost(x, y, m):
+    """
+    Calculates the cost between x and y using one of three cost methods
+    :param x: a number to evaluate cost
+    :param y: a number to evaluate cost
+    :param m: dictates which cost algorithm to use ( 1 or 2 or 3 )
+    :return: the cost between x and y
+    """
+    if x == y:
+        return 0
+    if m == 1:
+        if x < 3 and y < 3:
+            return 1
+        if x < 3 or y < 3:
+            return 200
+        if x % 7 == y % 7:
+            return 2
+        return abs(x - y) + 3  # iff no other value was returned
+    if m == 2:
+        if x + y < 10:
+            return abs(x - y) + 4
+        if (x + y) % 11 == 0:
+            return 3
+        return abs(x - y) ** 2 + 10  # iff no other value was returned
+    if m == 3:
+        return (x + y) ** 2
+
+
+def random_path(number_of_cities, seed):
+    rnd_path = list(range(number_of_cities))
+    random.seed(seed)
+    random.shuffle(rnd_path)
+    return rnd_path
+
+
+def path_cost(cities, cost_function: int):
+    """
+    Given a list of cities calculates the cost of the path
+    :param cities: a list of cities, their order in the list is a path
+    :param cost_function: which cost function to use ( 1 or 2 or 3 )
+    :return: the cost (or weight) of the path
+    """
+    total_cost = 0
+    # cost_temp = 0
+    n = len(cities)
+    for i, city in enumerate(cities):
+        if i == n - 1:
+            cost_temp = cost(cities[i], cities[0], cost_function)
+            total_cost += cost_temp
+        else:
+            cost_temp = cost(cities[i], cities[i + 1], cost_function)
+            total_cost += cost_temp
+    return total_cost
+
+
+def mutation_operator(cities):
+    """
+    This mutation operator swaps two cities randomly to create a new path
+    :param cities: a list of cities, their order in the list is a path
+    :return: a list of cities, with two of them swapped randomly
+    """
+    # https://stackoverflow.com/questions/10623302/how-does-assignment-work-with-list-slices
+    # https://www.geeksforgeeks.org/python-yield-keyword/
+    r1 = list(range(len(cities)))
+    r2 = list(range(len(cities)))
+    random.shuffle(r1)
+    random.shuffle(r2)
+    for i in r1:
+        for j in r2:
+            if i < j:
+                next_state = cities[:]  # copying the slice of cities into a variable called next
+                next_state[i], next_state[j] = cities[j], cities[i]  # performs a swap into next and NOT in cities
+                yield next_state
+
+
+def probability_acceptance(prev_score, next_score, temperature):
+    """
+    This method calculates a probability using prev_score and next_score and the temperature of the SA algorithm
+    :param prev_score: previous cost ( in this implementation )
+    :param next_score: next cost ( in this implementation )
+    :param temperature: the current temperature of the SA algorithm
+    :return: a double representing a probability
+    """
+    if next_score < prev_score:
+        return 1.0
+    if temperature == 0:
+        return 0.0
+    return math.exp(-abs(next_score - prev_score) / temperature)
+
+
+def cooling_schedule(start_temp, cooling_const):
+    """
+    This function continuously cools down the temperature of the SA algorithm using a constant value
+    :param start_temp: the starting temperature of the SA algorithm
+    :param cooling_const: a constant that satisfies 0 < cooling_const < 1
+    :return: the value of the new temperature
+    """
+    t = start_temp
+    while True:
+        yield t
+        t = cooling_const * t
+
+
+def SA(number_of_cities, cost_function, MEB, seed):
+    """
+    This function implements a Simulated Annealing algorithm for TSP
+    :param number_of_cities: self explanatory
+    :param cost_function: which cost function to use ( 1 or 2 or 3 )
+    :param MEB: Total number of evaluations allowed ( essentially, a limit on how much computational strength to use )
+    :param seed: a seed for the random_path() generator
+    :return: a tuple of (best path, best cost, number of evaluations)
+    """
+    # Note: these values are important for the offset of the SA algorithm and can be played around with
+    start_temp = 70
+    cooling_const = 0.9995
+    # best_path = None
+    # best_cost = None
+    curr_path = random_path(number_of_cities, seed)
+    curr_cost = path_cost(curr_path, cost_function)
+
+    # if best_path is None or curr_cost < best_cost:
+    best_cost = curr_cost
+    best_path = curr_path
+
+    evaluations = 1
+    temp_schedule = cooling_schedule(start_temp, cooling_const)
+    for temperature in temp_schedule:
+        flag = False
+        for next_path in mutation_operator(curr_path):
+            if evaluations == MEB:
+                flag = True
+                break
+
+            next_cost = path_cost(next_path, cost_function)
+
+            if best_path is None or next_cost < best_cost:
+                best_cost = next_cost
+                best_path = next_path
+
+            evaluations += 1
+            p = probability_acceptance(curr_cost, next_cost, temperature)
+            if random.random() < p:
+                curr_path = next_path
+                curr_cost = next_cost
+                break
+        if flag:
+            break
+
+    return best_path, best_cost, evaluations
+
+
+# END of TSP helper functions
 
 
 class GraphAlgo:
@@ -82,7 +241,7 @@ class GraphAlgo:
         # >>> g_algo.shortestPath(0,2)
         # (5, [0, 1, 2])
         Notes:
-        If there is no path between id1 and id2, or one of them dose not exist the function returns (float('inf'),[])
+        If there is no path between id1 and id2, or one of them do not exist the function returns (float('inf'),[])
         More info:
         https://en.wikipedia.org/wiki/Dijkstra's_algorithm
         """
@@ -100,11 +259,11 @@ class GraphAlgo:
                 dist_from_id1[node] = INF
 
         # Initialize previous_node, the dictionary that maps each node to the
-        # node it was visited from when the the shortest path to it was found.
+        # node it was visited from when the shortest path to it was found.
         previous_node = {node: None for node in self.get_graph().get_all_v()}
 
         while unvisited_nodes:
-            # Set current_node to the unvisited node with shortest distance
+            # Set current_node to the unvisited node with the shortest distance
             # calculated so far.
             current_node = min(
                 unvisited_nodes, key=lambda node: dist_from_id1[node]
@@ -112,7 +271,7 @@ class GraphAlgo:
             unvisited_nodes.pop(current_node)
 
             # if there's a node that is not connected to our node, its value is INF.
-            # no reason to keep checking because we cant traverse any further.
+            # no reason to keep checking because we can't traverse any further.
             if dist_from_id1[current_node] == INF:
                 break
 
@@ -146,13 +305,22 @@ class GraphAlgo:
         """
         Finds the shortest path that visits all the nodes in the list
         :param node_lst: A list of nodes id's
-        :return: A list of the nodes id's in the path, and the overall distance
+        :return: A list of the node id's in the path, and the overall distance (or cost/weight, etc...)
         """
+        # all helper functions are static
+        number_of_cities = len(node_lst)
+        MEB = 200000  # this is the maximum number of evaluations allowed in our function - IMPORTANT!
+        cost_function = 1  # TODO: test all cost function to see which one works best with our graphs ( 1 or 2 or 3 )
+        seed = 26  # this is a seed for a random path generator ( see SA implementation )
+        # start_time = time.time()
+        best_path, best_cost, evaluations = SA(number_of_cities, cost_function, MEB, seed)
+        # end_time = time.time()
+        return best_path, best_cost
 
     def centerPoint(self) -> (int, float):
         """
         Finds the node that has the shortest distance to it's farthest node.
-        :return: The nodes id, min-maximum distance
+        :return: The node id, min-maximum distance
         """
         min1 = sys.float_info.max
         node_id = -1
@@ -168,7 +336,8 @@ class GraphAlgo:
                 if tmp_dijk[0] is not INF:
                     if tmp > max1:
                         max1 = tmp
-                    if tmp > min1:  # in case there's a bigger dist break, because we don't want that -> Minimum of all maximum
+                    if tmp > min1:
+                        # we want Minimum of all maximums
                         break
 
             if min1 > max1:
