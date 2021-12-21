@@ -360,7 +360,7 @@ if __name__ == '__main__':
     nodes = {}
     tmp = DiGraph(nodes)
     g = GraphAlgo(tmp)
-    g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/1000Nodes.json")
+    g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json")
     # print(g.get_graph().all_out_edges_of_node(0))
     # print(g.get_graph().all_out_edges_of_node(0)[5])
     print(g.shortest_path(0, 6))
