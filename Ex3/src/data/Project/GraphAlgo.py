@@ -225,35 +225,37 @@ class GraphAlgo:
         for node in all_nodes:
             # key_list = list(all_nodes.keys())
             val_list = list(all_nodes.values())
+            pos = ''+val_list[node][0]+','+val_list[node][1]+','+val_list[node][2]+''
             data["Nodes"].append({
-                'pos': val_list[node],
+                'pos': pos,
                 'id': node
             })
             # Iterate once over OUT-going edges
             edges = self.get_graph().all_out_edges_of_node(node)
-            # key_list = list(edges.keys())
+            key_list = list(edges.keys())
             val_list = list(edges.values())
             for edge in edges:
                 if not (edge in data["Edges"]):  # TODO: is this the correct check?
                     data["Edges"].append({
                         'src': node,
-                        'w': val_list[edge],  # TODO: fix this line
+                        'w': val_list[key_list.index(edge)],
                         'dest': edge
                     })
 
             # Then iterate once over IN-going edges
             edges = self.get_graph().all_in_edges_of_node(node)
-            # key_list = list(edges.keys())
+            key_list = list(edges.keys())
             val_list = list(edges.values())
             for edge in edges:
                 if not (edge in data["Edges"]):  # TODO: duplicate, is this the correct check?
                     data["Edges"].append({
-                        'src': node,
-                        'w': val_list[edge],  # TODO: fix this line
-                        'dest': edge
+                        'src': edge,
+                        'w': val_list[key_list.index(edge)],
+                        'dest': node
                     })
-        with open(file_name, "wx"):
-            json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
+        # open(file_name, "x")
+        json_file = open(file_name, "w")
+        json_file.write(json.dumps(data, indent=4, ensure_ascii=False))
         """
         Explanation on values passed to json.dumps():
         indent = 4  -  activates pretty print if an integer is passed
