@@ -2,7 +2,6 @@ import json
 import math
 import random
 import sys
-# import time
 from collections import deque
 from typing import List
 
@@ -13,6 +12,7 @@ INF = float("inf")
 
 
 # START of TSP helper functions
+# TODO: use weight instead of arbitrary costs!!!
 def cost(x, y, m):
     """
     Calculates the cost between x and y using one of three cost methods
@@ -164,6 +164,54 @@ def SA(number_of_cities, cost_function, MEB, seed):
     return best_path, best_cost, evaluations
 
 
+def fixPath(original_cities: list, best_path: list):
+    """
+    This method receives a zero based path containing all integers from 0 to path_length - 1 and converts it
+    to the actual city id's that are stored in original_cities
+    :param original_cities: A list of cities as passed to the TSP method
+    :param best_path: the path returned by the SA method
+    :return: a fixed copy of best_path
+    """
+    # ans = copy.deepcopy(best_path)  # Consider altering best_path instead.
+    sorted_cities = sorted(original_cities)
+    best = dict(zip(iter(range(0, len(best_path))), iter(best_path)))  # converting best_path to a more accessible dict
+    # print("out of loop: ", best)
+
+    first_run = True
+    counter = 0
+    for node in sorted_cities:
+        if first_run:
+            if node != 0:
+                for key in best:
+                    best[key] += node
+                # print("in first run: ", best)
+            first_run = False
+            prev = node
+            last_min_modified = node
+        else:
+            if prev + 1 == node:
+                counter += 1
+            else:
+                diff = node - prev - 1
+                # print("diff: ", diff)
+                # print("lmm: ", last_min_modified)
+                last_min_modified += counter
+                # print("counter: ", counter)
+                # print("last min mod: ", last_min_modified)
+                for key in best:
+                    if best[key] > last_min_modified:
+                        best[key] += diff
+                last_min_modified += diff + 1
+                # print("other runs: ", best)
+                counter = 0
+            prev = node
+    # print(best)
+    ans = []
+    for key in best:
+        ans.append(best[key])
+    return ans
+
+
 # END of TSP helper functions
 
 
@@ -225,7 +273,7 @@ class GraphAlgo:
         for node in all_nodes:
             # key_list = list(all_nodes.keys())
             val_list = list(all_nodes.values())
-            pos = ''+val_list[node][0]+','+val_list[node][1]+','+val_list[node][2]+''
+            pos = '' + val_list[node][0] + ',' + val_list[node][1] + ',' + val_list[node][2] + ''
             data["Nodes"].append({
                 'pos': pos,
                 'id': node
@@ -354,12 +402,13 @@ class GraphAlgo:
         # all helper functions are static
         number_of_cities = len(node_lst)
         MEB = 200000  # this is the maximum number of evaluations allowed in our function - IMPORTANT!
-        cost_function = 1  # TODO: test all cost function to see which one works best with our graphs ( 1 or 2 or 3 )
+        cost_function = 1
         seed = 26  # this is a seed for a random path generator ( see SA implementation )
         # start_time = time.time()
         best_path, best_cost, evaluations = SA(number_of_cities, cost_function, MEB, seed)
         # end_time = time.time()
-        return best_path, best_cost
+        # print(best_path)
+        return fixPath(node_lst, best_path), best_cost
 
     def centerPoint(self) -> (int, float):
         """

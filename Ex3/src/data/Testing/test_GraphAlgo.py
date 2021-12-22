@@ -37,7 +37,8 @@ class TestGraphAlgo(TestCase):
         self.fail()
 
     def test_tsp(self):
-        self.fail()
+        cities = {3, 2, 14, 5, 11, 10, 4}
+        print(self.graph_algo.TSP(cities))
 
     def test_center_point(self):
         print(self.graph_algo.centerPoint())
