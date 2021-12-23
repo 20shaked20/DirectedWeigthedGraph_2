@@ -12,6 +12,10 @@ PINK = (255, 200, 200)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 
+"""
+LEGACY CLASS, not using!!! moved to work on gui via matplotlib.
+"""
+
 
 class GraphGui:
 
@@ -98,12 +102,12 @@ class GraphGui:
         pygame.draw.line(self.screen, colour, start, end, 2)
         rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
         pygame.draw.polygon(self.screen, BLACK, (
-            (end[0] -5 * math.sin(math.radians(rotation)), end[1] -5 * math.cos(math.radians(rotation))),
+            (end[0] - 5 * math.sin(math.radians(rotation)), end[1] - 5 * math.cos(math.radians(rotation))),
             (
-                end[0] +30 * math.sin(math.radians(rotation - 120)),
-                end[1] +30 * math.cos(math.radians(rotation - 120))),
-            (end[0] +30 * math.sin(math.radians(rotation + 120)),
-             end[1] +30 * math.cos(math.radians(rotation + 120)))))
+                end[0] + 30 * math.sin(math.radians(rotation - 120)),
+                end[1] + 30 * math.cos(math.radians(rotation - 120))),
+            (end[0] + 30 * math.sin(math.radians(rotation + 120)),
+             end[1] + 30 * math.cos(math.radians(rotation + 120)))))
 
 
 if __name__ == '__main__':

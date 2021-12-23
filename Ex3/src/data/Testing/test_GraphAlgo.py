@@ -12,8 +12,8 @@ class TestGraphAlgo(TestCase):
     def setUp(self) -> None:
         nodes = {}
         g = DiGraph(nodes)
-        # path = "/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json"
-        path = "C:/Users/yonar/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json"
+        path = "/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/1000Nodes.json"
+        # path = "C:/Users/yonar/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json"
         self.graph_algo = GraphAlgo(g)
         self.graph_algo.load_from_json(path)
 

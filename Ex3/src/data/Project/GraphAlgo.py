@@ -6,9 +6,8 @@ import sys
 import time
 from collections import deque
 from typing import List
-
-import matplotlib.pyplot
 import matplotlib.pyplot as plt
+from matplotlib.widgets import *
 
 from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
@@ -16,18 +15,10 @@ from Ex3.src.data.Project.DiGraph import DiGraph
 INF = float("inf")
 
 
-def cooling_schedule(start_temp, cooling_const):
-    """
-    This function continuously cools down the temperature of the SA algorithm using a constant value
-    :param start_temp: the starting temperature of the SA algorithm
-    :param cooling_const: a constant that satisfies 0 < cooling_const < 1
-    :return: the value of the new temperature
-    """
-    t = start_temp
-    while True:
-        yield t
-        t = cooling_const * t
-
+# TODO:
+#  1. create is connected
+#  2. finish tests
+#  3. fix random issue with matplotlib
 
 class GraphAlgo:
 
@@ -39,6 +30,7 @@ class GraphAlgo:
         self.graph = graph
         self.nodesX = {}
         self.nodesY = {}
+        self.ax = None
 
     """This abstract class represents an interface of a graph."""
 
@@ -127,8 +119,6 @@ class GraphAlgo:
         ensure_ascii = False  -  does not escape unicode characters to match ASCII 
         ( for example 'cost':'£4.00' becomes --> "cost": "\u00a34.00" if ensure_ascii=True )
         """
-
-        # raise NotImplementedError
 
     def shortest_path(self, id1: int, id2: int) -> (float, list):
         """
@@ -224,7 +214,9 @@ class GraphAlgo:
         return best_path, best_cost
         # return self.fixPath(node_lst, best_path), best_cost
 
-    # START of TSP helper functions
+    """
+    START of TSP helper functions
+    """
 
     def cost(self, node, neighbour):
         if node == neighbour:
@@ -314,7 +306,15 @@ class GraphAlgo:
             path.append(curr_node)
         return path
 
-    # END of TSP helper functions
+    """
+    END of TSP helper functions
+    """
+
+    def is_connected(self) -> bool:
+        """
+        private method that checks if the graph is strongly connected or not.
+        :return: True if yes, false if not.
+        """
 
     def centerPoint(self) -> (int, float):
         """
@@ -345,6 +345,10 @@ class GraphAlgo:
 
         return node_id, min1
 
+    """
+    From here an on all the methods relate to plot graph.
+    """
+
     def plot_graph(self) -> None:
         """
         Plots the graph.
@@ -352,17 +356,40 @@ class GraphAlgo:
         Otherwise, they will be placed in a random but elegant manner.
         @return: None
         """
-
+        fig = plt.figure(figsize=(20, 8), facecolor='gray', edgecolor='blue')
+        self.ax = fig.subplots()  # for graph
+        plt.subplots_adjust(left=0.35, bottom=0.1)
         self.update_x_y_pos()
         for k in self.nodesX:
-            plt.plot(self.nodesX.get(k), self.nodesY.get(k), markersize=12, marker='o', color='blue')
-            plt.text(self.nodesX.get(k)+10, self.nodesY.get(k)+5, str(k), color='black', fontsize=10)
+            plt.plot(self.nodesX.get(k), self.nodesY.get(k), markersize=6, marker='o', color='blue')  # NODE
+            plt.text(self.nodesX.get(k) + 10, self.nodesY.get(k) + 5, str(k), color='black', fontsize=10)  # ID
         self.draw_line_arrows()
+        plt.title('DW_Graph')
         plt.ylabel('y-axis')
         plt.xlabel('x-axis')
+        # button functionality
+
+        # CENTER:
+        c_loc = plt.axes([0.2, 0.80, 0.1, 0.075])
+        c_b = Button(c_loc, label='Center', hovercolor='blue')
+        c_b.on_clicked(self.draw_center)
+
+        # DIJKSTRA
+        box_loc = plt.axes([0.07, 0.80, 0.1, 0.075])
+        text_box = TextBox(box_loc, 'Shortest_Path', initial="Insert id1,id2")
+        text_box.on_submit(self.draw_sp)
+
+        # Clear
+        clr_loc = plt.axes([0.07, 0.7, 0.1, 0.075])
+        clr_but = Button(clr_loc, label='Clear', hovercolor='blue')
+        clr_but.on_clicked(self.clear)
+
         plt.show()
 
-    def draw_line_arrows(self):
+    def draw_line_arrows(self) -> None:
+        """
+        private method to draw arrow lines for the graph.
+        """
         nodes = self.get_graph().get_all_v()
         for k in nodes:
             out_edge = self.get_graph().all_out_edges_of_node(k)
@@ -371,7 +398,10 @@ class GraphAlgo:
                 end = [self.nodesX[v], self.nodesY[v]]
                 plt.annotate("", xy=(start[0], start[1]), xytext=(end[0], end[1]), arrowprops=dict(arrowstyle="->"))
 
-    def update_x_y_pos(self):
+    def update_x_y_pos(self) -> None:
+        """
+        private method that updates the positions of the nodes to fit correctly in the plot
+        """
         minX = sys.float_info.max
         minY = sys.float_info.max
         maxX = sys.float_info.min
@@ -400,8 +430,32 @@ class GraphAlgo:
             self.nodesX[curr_id] = int(x)
             self.nodesY[curr_id] = int(y)
 
+    def draw_center(self, event) -> None:
+        center = self.centerPoint()[0]
+        self.ax.plot(self.nodesX[center], self.nodesY[center], markersize=6, marker='o', color='orange')
+        plt.show()
+
+    def draw_sp(self, event) -> None:
+        data = eval(event)
+        id1 = data[0]
+        id2 = data[1]
+        path = list((self.shortest_path(id1, id2)[0]))
+        print(path)
+        i = 0
+        for k in range(0, len(path)):
+            start = (self.nodesX[path[i]], self.nodesY[path.pop(i)])
+            end = (self.nodesX[path[i]], self.nodesY[path[i]])
+            self.ax.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]),
+                             arrowprops=dict(arrowstyle="fancy"))  # reversed position here because of arrow location
+        plt.show()
+
+    def clear(self, event) -> None:
+        plt.close()
+        self.plot_graph()
+
 
 if __name__ == '__main__':
+    nodes = {}
     nodes = {}
     tmp = DiGraph(nodes)
     g = GraphAlgo(tmp)

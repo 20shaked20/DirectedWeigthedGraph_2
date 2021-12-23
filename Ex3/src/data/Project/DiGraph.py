@@ -1,6 +1,11 @@
 from Ex3.src.data.Project.Node import Node
 
 
+# TODO:
+#  1. remove node
+#  2. remove edge
+#  3. finish tests
+
 class DiGraph:
 
     def __init__(self, nodes: dict) -> None:
@@ -12,7 +17,7 @@ class DiGraph:
         edges_size : number of edges in the graph ->
         -> is set to zero because at first there are only edges going out of nodes so we cant tell if they are connected
         """
-        self.nodes = nodes
+        self.nodes = {}
         self.MC = 0
         self.node_size = len(nodes)
         self.edges_size = 0  # adding edges later, so it's set to 0
