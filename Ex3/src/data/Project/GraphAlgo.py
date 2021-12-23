@@ -1,7 +1,9 @@
+import copy
 import json
 import math
 import random
 import sys
+import time
 from collections import deque
 from typing import List
 
@@ -9,98 +11,6 @@ from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
 
 INF = float("inf")
-
-
-# START of TSP helper functions
-# TODO: use weight instead of arbitrary costs!!!
-def cost(x, y, m):
-    """
-    Calculates the cost between x and y using one of three cost methods
-    :param x: a number to evaluate cost
-    :param y: a number to evaluate cost
-    :param m: dictates which cost algorithm to use ( 1 or 2 or 3 )
-    :return: the cost between x and y
-    """
-    if x == y:
-        return 0
-    if m == 1:
-        if x < 3 and y < 3:
-            return 1
-        if x < 3 or y < 3:
-            return 200
-        if x % 7 == y % 7:
-            return 2
-        return abs(x - y) + 3  # iff no other value was returned
-    if m == 2:
-        if x + y < 10:
-            return abs(x - y) + 4
-        if (x + y) % 11 == 0:
-            return 3
-        return abs(x - y) ** 2 + 10  # iff no other value was returned
-    if m == 3:
-        return (x + y) ** 2
-
-
-def random_path(number_of_cities, seed):
-    rnd_path = list(range(number_of_cities))
-    random.seed(seed)
-    random.shuffle(rnd_path)
-    return rnd_path
-
-
-def path_cost(cities, cost_function: int):
-    """
-    Given a list of cities calculates the cost of the path
-    :param cities: a list of cities, their order in the list is a path
-    :param cost_function: which cost function to use ( 1 or 2 or 3 )
-    :return: the cost (or weight) of the path
-    """
-    total_cost = 0
-    # cost_temp = 0
-    n = len(cities)
-    for i, city in enumerate(cities):
-        if i == n - 1:
-            cost_temp = cost(cities[i], cities[0], cost_function)
-            total_cost += cost_temp
-        else:
-            cost_temp = cost(cities[i], cities[i + 1], cost_function)
-            total_cost += cost_temp
-    return total_cost
-
-
-def mutation_operator(cities):
-    """
-    This mutation operator swaps two cities randomly to create a new path
-    :param cities: a list of cities, their order in the list is a path
-    :return: a list of cities, with two of them swapped randomly
-    """
-    # https://stackoverflow.com/questions/10623302/how-does-assignment-work-with-list-slices
-    # https://www.geeksforgeeks.org/python-yield-keyword/
-    r1 = list(range(len(cities)))
-    r2 = list(range(len(cities)))
-    random.shuffle(r1)
-    random.shuffle(r2)
-    for i in r1:
-        for j in r2:
-            if i < j:
-                next_state = cities[:]  # copying the slice of cities into a variable called next
-                next_state[i], next_state[j] = cities[j], cities[i]  # performs a swap into next and NOT in cities
-                yield next_state
-
-
-def probability_acceptance(prev_score, next_score, temperature):
-    """
-    This method calculates a probability using prev_score and next_score and the temperature of the SA algorithm
-    :param prev_score: previous cost ( in this implementation )
-    :param next_score: next cost ( in this implementation )
-    :param temperature: the current temperature of the SA algorithm
-    :return: a double representing a probability
-    """
-    if next_score < prev_score:
-        return 1.0
-    if temperature == 0:
-        return 0.0
-    return math.exp(-abs(next_score - prev_score) / temperature)
 
 
 def cooling_schedule(start_temp, cooling_const):
@@ -114,105 +24,6 @@ def cooling_schedule(start_temp, cooling_const):
     while True:
         yield t
         t = cooling_const * t
-
-
-def SA(number_of_cities, cost_function, MEB, seed):
-    """
-    This function implements a Simulated Annealing algorithm for TSP
-    :param number_of_cities: self-explanatory
-    :param cost_function: which cost function to use ( 1 or 2 or 3 )
-    :param MEB: Total number of evaluations allowed ( essentially, a limit on how much computational strength to use )
-    :param seed: a seed for the random_path() generator
-    :return: a tuple of (best path, best cost, number of evaluations)
-    """
-    # Note: these values are important for the offset of the SA algorithm and can be played around with
-    start_temp = 70
-    cooling_const = 0.9995
-    # best_path = None
-    # best_cost = None
-    curr_path = random_path(number_of_cities, seed)
-    curr_cost = path_cost(curr_path, cost_function)
-
-    # if best_path is None or curr_cost < best_cost:
-    best_cost = curr_cost
-    best_path = curr_path
-
-    evaluations = 1
-    temp_schedule = cooling_schedule(start_temp, cooling_const)
-    for temperature in temp_schedule:
-        flag = False
-        for next_path in mutation_operator(curr_path):
-            if evaluations == MEB:
-                flag = True
-                break
-
-            next_cost = path_cost(next_path, cost_function)
-
-            if best_path is None or next_cost < best_cost:
-                best_cost = next_cost
-                best_path = next_path
-
-            evaluations += 1
-            p = probability_acceptance(curr_cost, next_cost, temperature)
-            if random.random() < p:
-                curr_path = next_path
-                curr_cost = next_cost
-                break
-        if flag:
-            break
-
-    return best_path, best_cost, evaluations
-
-
-def fixPath(original_cities: list, best_path: list):
-    """
-    This method receives a zero based path containing all integers from 0 to path_length - 1 and converts it
-    to the actual city id's that are stored in original_cities
-    :param original_cities: A list of cities as passed to the TSP method
-    :param best_path: the path returned by the SA method
-    :return: a fixed copy of best_path
-    """
-    # ans = copy.deepcopy(best_path)  # Consider altering best_path instead.
-    sorted_cities = sorted(original_cities)
-    best = dict(zip(iter(range(0, len(best_path))), iter(best_path)))  # converting best_path to a more accessible dict
-    # print("out of loop: ", best)
-
-    first_run = True
-    counter = 0
-    for node in sorted_cities:
-        if first_run:
-            if node != 0:
-                for key in best:
-                    best[key] += node
-                # print("in first run: ", best)
-            first_run = False
-            prev = node
-            last_min_modified = node
-        else:
-            if prev + 1 == node:
-                counter += 1
-            else:
-                diff = node - prev - 1
-                # print("diff: ", diff)
-                # print("lmm: ", last_min_modified)
-                last_min_modified += counter
-                # print("counter: ", counter)
-                # print("last min mod: ", last_min_modified)
-                for key in best:
-                    if best[key] > last_min_modified:
-                        best[key] += diff
-                last_min_modified += diff + 1
-                # print("other runs: ", best)
-                counter = 0
-            prev = node
-    # print(best)
-    ans = []
-    for key in best:
-        ans.append(best[key])
-    return ans
-
-
-# END of TSP helper functions
 
 
 class GraphAlgo:
@@ -399,16 +210,106 @@ class GraphAlgo:
         :param node_lst: A list of nodes id's
         :return: A list of the node id's in the path, and the overall distance (or cost/weight, etc...)
         """
-        # all helper functions are static
-        number_of_cities = len(node_lst)
-        MEB = 200000  # this is the maximum number of evaluations allowed in our function - IMPORTANT!
-        cost_function = 1
-        seed = 26  # this is a seed for a random path generator ( see SA implementation )
-        # start_time = time.time()
-        best_path, best_cost, evaluations = SA(number_of_cities, cost_function, MEB, seed)
-        # end_time = time.time()
-        # print(best_path)
-        return fixPath(node_lst, best_path), best_cost
+        start_time = time.time()
+        best_path = self.greedy_tsp(node_lst)
+        temp_path = copy.deepcopy(best_path)
+        best_cost = self.path_weight(temp_path)
+        end_time = time.time()
+        print("Approximated a solution for TSP in:", end_time - start_time, "seconds with weight:", best_cost)
+        return best_path, best_cost
+        # return self.fixPath(node_lst, best_path), best_cost
+
+    # START of TSP helper functions
+
+    def cost(self, node, neighbour):
+        if node == neighbour:
+            return 0.0
+        neighbours = self.get_graph().all_out_edges_of_node(node)
+        if len(neighbours) > 0:
+            return neighbours.get(neighbour)
+        return sys.float_info.max
+
+    def path_weight(self, path: list[int]):
+        path.reverse()
+        ans = 0
+        prev = path.pop()
+        while path:
+            next_n = path.pop()
+            temp = self.cost(prev, next_n)
+            ans += temp
+            prev = next_n
+        return ans
+
+    def get_cheapest_neighbour(self, node):
+        """
+        This method find the cheapest neighbour of a node, and returns it.
+        :param node: An integer for a node for which we want the cheapest neighbour
+        :return: An int representing the cheapest neighbour node id, or -1 if no neighbours
+        """
+        neighbours = self.get_graph().all_out_edges_of_node(node)
+        if len(neighbours) == 0:
+            return -1
+        best_cost = sys.float_info.max
+        for neighbour in neighbours:
+            cost = self.cost(node, neighbour)
+            if cost < best_cost:
+                best_cost = cost
+                best_neighbour = neighbour
+        return best_neighbour
+
+    def greedy_tsp(self, cities: list[int]) -> List[int]:
+        curr_node = cities.pop()
+        path = [curr_node]
+
+        while len(cities) > 0:
+
+            if len(cities) == 1:
+                temp = self.shortest_path(path[-1], cities.pop())
+                path_to_rel = tuple(temp)
+                path_to_rel = path_to_rel[0]
+                path_to_rel.popleft()
+                while path_to_rel:
+                    path.append(path_to_rel.popleft())
+                # to_visit.remove(min(to_visit))
+                continue  # fixed being stuck by plotting a path to a point in the list
+
+            curr_node = self.get_cheapest_neighbour(path[-1])  # get the cheapest neighbour of last element in the path.
+            if curr_node in cities:
+                cities.remove(curr_node)
+
+            # exceptions : same solution, seperated for semantic reasons ( i.e. accessing path[-2] )
+
+            # 1. no neighbours ( stuck )
+
+            if curr_node == -1:
+                temp = self.shortest_path(path[-1], cities.pop())
+                path_to_rel = tuple(temp)
+                path_to_rel = path_to_rel[0]
+                path_to_rel.popleft()
+                while path_to_rel:
+                    path.append(path_to_rel.popleft())
+                # to_visit.remove(min(to_visit))
+                continue  # fixed being stuck by plotting a path to a point in the list
+
+            # 2. looping ( repeating the same path )
+
+            if len(path) >= 2:
+                if path[-2] == curr_node:  # if we detect a loop, or we are stuck
+                    # path_to_rel = self.shortest_path(path[-1], cities.pop())
+                    path_to_rel = tuple(self.shortest_path(path[-1], cities.pop()))
+                    path_to_rel: deque = path_to_rel[0]  # this is a deque object
+                    path_to_rel.popleft()
+                    while path_to_rel:
+                        path.append(path_to_rel.popleft())
+                    # to_visit.remove(min(to_visit))
+                    continue  # fixed being stuck by plotting a path to a point in the list
+
+            # if all is 'right'
+
+            path.append(curr_node)
+        return path
+
+    # END of TSP helper functions
 
     def centerPoint(self) -> (int, float):
         """
