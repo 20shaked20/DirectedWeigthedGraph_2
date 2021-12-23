@@ -7,6 +7,9 @@ import time
 from collections import deque
 from typing import List
 
+import matplotlib.pyplot
+import matplotlib.pyplot as plt
+
 from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
 
@@ -34,6 +37,8 @@ class GraphAlgo:
         :param graph: represents a DiGraph.
         """
         self.graph = graph
+        self.nodesX = {}
+        self.nodesY = {}
 
     """This abstract class represents an interface of a graph."""
 
@@ -347,7 +352,53 @@ class GraphAlgo:
         Otherwise, they will be placed in a random but elegant manner.
         @return: None
         """
-        raise NotImplementedError
+
+        self.update_x_y_pos()
+        for k in self.nodesX:
+            plt.plot(self.nodesX.get(k), self.nodesY.get(k), markersize=12, marker='o', color='blue')
+            plt.text(self.nodesX.get(k)+10, self.nodesY.get(k)+5, str(k), color='black', fontsize=10)
+        self.draw_line_arrows()
+        plt.ylabel('y-axis')
+        plt.xlabel('x-axis')
+        plt.show()
+
+    def draw_line_arrows(self):
+        nodes = self.get_graph().get_all_v()
+        for k in nodes:
+            out_edge = self.get_graph().all_out_edges_of_node(k)
+            start = [self.nodesX[k], self.nodesY[k]]
+            for v in out_edge:
+                end = [self.nodesX[v], self.nodesY[v]]
+                plt.annotate("", xy=(start[0], start[1]), xytext=(end[0], end[1]), arrowprops=dict(arrowstyle="->"))
+
+    def update_x_y_pos(self):
+        minX = sys.float_info.max
+        minY = sys.float_info.max
+        maxX = sys.float_info.min
+        maxY = sys.float_info.min
+
+        nodes = self.get_graph().get_all_v()
+
+        for k in nodes:
+            curr_pos = nodes[k]
+            x = float(curr_pos[0])
+            y = float(curr_pos[1])
+            minX = min(minX, x)
+            minY = min(minY, y)
+            maxX = max(maxX, x)
+            maxY = max(maxY, y)
+
+        X_Scaling = 1000 / (maxX - minX) * 0.9
+        Y_Scaling = 1000 / (maxY - minY) * 0.9
+
+        for k in nodes:
+            curr_id = k
+            curr_pos = nodes[k]
+            x = (float(curr_pos[0]) - minX) * X_Scaling + 10
+            y = (float(curr_pos[1]) - minY) * Y_Scaling + 30
+
+            self.nodesX[curr_id] = int(x)
+            self.nodesY[curr_id] = int(y)
 
 
 if __name__ == '__main__':
@@ -357,5 +408,6 @@ if __name__ == '__main__':
     g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json")
     # print(g.get_graph().all_out_edges_of_node(0))
     # print(g.get_graph().all_out_edges_of_node(0)[5])
-    print(g.shortest_path(0, 6))
-    print(g.centerPoint())
+    # print(g.shortest_path(0, 6))
+    # print(g.centerPoint())
+    g.plot_graph()

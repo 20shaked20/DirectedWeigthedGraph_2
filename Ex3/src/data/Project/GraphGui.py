@@ -98,17 +98,17 @@ class GraphGui:
         pygame.draw.line(self.screen, colour, start, end, 2)
         rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
         pygame.draw.polygon(self.screen, BLACK, (
-            (end[0] -10 * math.sin(math.radians(rotation)), end[1] -10 * math.cos(math.radians(rotation))),
+            (end[0] -5 * math.sin(math.radians(rotation)), end[1] -5 * math.cos(math.radians(rotation))),
             (
-                end[0] + 50 * math.sin(math.radians(rotation - 120)),
-                end[1] + 50 * math.cos(math.radians(rotation - 120))),
-            (end[0] + 50 * math.sin(math.radians(rotation + 120)),
-             end[1] + 50 * math.cos(math.radians(rotation + 120)))))
+                end[0] +30 * math.sin(math.radians(rotation - 120)),
+                end[1] +30 * math.cos(math.radians(rotation - 120))),
+            (end[0] +30 * math.sin(math.radians(rotation + 120)),
+             end[1] +30 * math.cos(math.radians(rotation + 120)))))
 
 
 if __name__ == '__main__':
     nodes = {}
     graph = DiGraph(nodes)
     graph_algo = GraphAlgo(graph)
-    graph_algo.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A1.json")
+    graph_algo.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json")
     run = GraphGui(graph_algo)
