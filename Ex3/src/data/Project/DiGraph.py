@@ -1,14 +1,11 @@
+from numpy.random import uniform
+
 from Ex3.src.data.Project.Node import Node
 
 
-# TODO:
-#  1. remove node
-#  2. remove edge
-#  3. finish tests
-
 class DiGraph:
 
-    def __init__(self, nodes: dict) -> None:
+    def __init__(self, nodes: dict = None) -> None:
         """
         Constructor method, using a node dictionary to store all nodes & their edges.
         :param nodes: dictionary of nodes
@@ -17,9 +14,11 @@ class DiGraph:
         edges_size : number of edges in the graph ->
         -> is set to zero because at first there are only edges going out of nodes so we cant tell if they are connected
         """
-        self.nodes = {}
+        if nodes is None:
+            self.nodes = {}
+        else:
+            self.nodes = nodes
         self.MC = 0
-        self.node_size = len(nodes)
         self.edges_size = 0  # adding edges later, so it's set to 0
 
     def v_size(self) -> int:
@@ -27,7 +26,9 @@ class DiGraph:
         Returns the number of vertices in this graph
         @return: The number of vertices in this graph
         """
-        return len(self.nodes)
+        if self.nodes.keys() is not None:
+            return len(self.nodes)
+        return 0
 
     def e_size(self) -> int:
         """
@@ -80,8 +81,8 @@ class DiGraph:
             return False
         if id1 == id2:  # same id cannot have own edge
             return False
-        self.nodes.get(id1).add_edge_out(id2, weight)
-        self.nodes.get(id2).add_edge_in(id1, weight)
+        self.nodes.get(id1).add_edge_out(id2, weight)  # 1-->2
+        self.nodes.get(id2).add_edge_in(id1, weight)  # 2<--1
         self.edges_size += 1
         self.MC += 1
         return True
@@ -94,8 +95,11 @@ class DiGraph:
         @return: True if the node was added successfully, False o.w.
         Note: if the node id already exists the node will not be added
         """
-        if node_id in self.nodes:
-            return False
+        if self.nodes is not None:
+            if node_id in self.nodes:
+                return False
+        if pos is None:
+            pos = (uniform(0.0, 100.0), uniform(0.0, 100.0), 0.0)  # in case it has no position create a random one!.
         tmp_node = Node(node_id, pos)
         self.nodes[node_id] = tmp_node
         self.MC += 1
@@ -103,7 +107,6 @@ class DiGraph:
 
     def remove_node(self, node_id: int) -> bool:
         """
-        TODO: make this work.
         Removes a node from the graph.
         @param node_id: The node ID
         @return: True if the node was removed successfully, False o.w.
@@ -111,11 +114,20 @@ class DiGraph:
         """
         if node_id not in self.nodes:  # node does not exist case.
             return False
-        pass
+        # remove the node it self, it will on the way remove all the out edges & in edges.
+        del [self.nodes[node_id]]
+        # this loop will check if another node has had a connection with the node so i will remove it also.
+        nodes = self.get_all_v()
+        for k in nodes:
+            curr_node = self.nodes[k]
+            if node_id in curr_node.all_edges_out_dict().keys():  # out other nodes edges
+                del curr_node.all_edges_out_dict()[node_id]
+            if node_id in curr_node.all_edges_in_dict().keys():  # in other nodes edges
+                del curr_node.all_edges_in_dict()[node_id]
+        return True
 
     def remove_edge(self, node_id1: int, node_id2: int) -> bool:
         """
-        TODO: make this work.
         Removes an edge from the graph.
         @param node_id1: The start node of the edge
         @param node_id2: The end node of the edge
@@ -124,5 +136,9 @@ class DiGraph:
         """
         if node_id1 == node_id2:  # same id can't add that edge at all.
             return False
-        if node_id1 in self.nodes.get(node_id1).all_edges_out_dict().keys():  # if edge exists
-            pass
+        if node_id1 in self.nodes and node_id2 in self.nodes:  # if edge exists
+            nod1 = self.nodes[node_id1]
+            nod2 = self.nodes[node_id2]
+            del nod1.all_edges_out_dict()[node_id2]
+            del nod2.all_edges_in_dict()[node_id1]
+        return True

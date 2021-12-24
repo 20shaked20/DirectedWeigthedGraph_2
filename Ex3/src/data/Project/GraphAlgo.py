@@ -8,6 +8,7 @@ from collections import deque
 from typing import List
 import matplotlib.pyplot as plt
 from matplotlib.widgets import *
+from numpy.random import uniform
 
 from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
@@ -16,18 +17,23 @@ INF = float("inf")
 
 
 # TODO:
+#   John to_do:
 #  1. create is connected
 #  2. finish tests
-#  3. fix random issue with matplotlib
+#  3. FIX THE TSP, -> cannot run on main.py
+#  4. SAVE is not working at all in the "main.py"
 
 class GraphAlgo:
 
-    def __init__(self, graph: GraphInterface):  # actually its DiGraph.
+    def __init__(self, graph: GraphInterface = None):  # actually its DiGraph.
         """
         This is the constructor of the graph
         :param graph: represents a DiGraph.
         """
-        self.graph = graph
+        if graph is None:
+            self.graph = DiGraph()
+        else:
+            self.graph = graph
         self.nodesX = {}
         self.nodesY = {}
         self.ax = None
@@ -53,12 +59,19 @@ class GraphAlgo:
                 nodes = _dict["Nodes"]
 
                 # NODE Creation:
+                xyz_tuple = None # standard position
+                key = "pos"
                 for k in nodes:
-                    curr_pos = k["pos"]
-                    xyz_split = curr_pos.split(",")
-                    xyz_tuple = tuple(xyz_split)
-                    curr_id = k["id"]
-                    self.graph.add_node(curr_id, xyz_tuple)
+                    if key in k:
+                        curr_pos = k["pos"]
+                        xyz_split = curr_pos.split(",")
+                        xyz_tuple = tuple(xyz_split)
+                        curr_id = k["id"]
+                        self.graph.add_node(curr_id, xyz_tuple)
+                    else:
+                        xyz_tuple = (uniform(0.0, 100.0), uniform(0.0, 100.0), 0.0)  # in case it has
+                        curr_id = k["id"]
+                        self.graph.add_node(curr_id, xyz_tuple)
 
                 # EDGES Creation:
                 for k in edges:
@@ -197,7 +210,7 @@ class GraphAlgo:
         if dist_from_id1[id2] is INF or dist_from_id1[id2] <= 0:
             return INF, []
 
-        return path, dist_from_id1[id2]
+        return list(path), dist_from_id1[id2]
 
     def TSP(self, node_lst: List[int]) -> (List[int], float):
         """

@@ -63,7 +63,20 @@ class TestDiGraph(TestCase):
         self.assertEqual(self.g.add_node(4, pos), False)
 
     def test_remove_node(self):
-        self.fail()
+        weight = 5.5
+        self.g.add_edge(0, 1, weight)  # adding edge : 0 ---> 1 with weight 5.5
+        self.g.add_edge(0, 2, weight)  # adding edge : 0 ---> 2 with weight 5.5
+        self.g.remove_node(0)
+        self.assertEqual(self.node1.all_edges_in_dict(),{})  # supposed to be empty because the node was connected to it!
+        self.assertEqual(self.g.get_all_v(), {1: (35.18958953510896, 32.10785303529412, 0.0),
+                                              2: (35.19341035835351, 32.10610841680672, 0.0)}) # without node 0!
 
     def test_remove_edge(self):
-        self.fail()
+        weight = 5.5
+        self.g.add_edge(0, 1, weight)  # adding edge : 0 ---> 1 with weight 5.5
+        self.g.add_edge(0, 2, weight)  # adding edge : 0 ---> 2 with weight 5.5
+        self.assertEqual(self.node0.all_edges_out_dict(), {1: 5.5, 2: 5.5})
+        self.assertEqual(self.node1.all_edges_in_dict(), {0: 5.5})
+        self.g.remove_edge(0, 1)
+        self.assertEqual(self.node0.all_edges_out_dict(), {2: 5.5})  # without connection 0 --> 1
+        self.assertEqual(self.node1.all_edges_in_dict(), {})  # without connection 1 <-- 0
