@@ -40,9 +40,6 @@ class TestNode(TestCase):
                       'id': 0}
         self.assertEqual(self.node0.node_dict(), check_dict)
 
-    # def test_edge_dict(self):
-    #     self.fail()
-
     def test_all_edges_out_dict(self):
         # Node2 out edges dict : ( 2 ---> dest )
         weight = 5.5

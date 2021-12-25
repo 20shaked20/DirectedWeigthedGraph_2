@@ -5,6 +5,7 @@ from collections import deque
 from typing import List
 
 # Drawing imports
+
 import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.widgets import *
@@ -12,12 +13,14 @@ from numpy.random import uniform
 from tkinter import *
 from tkinter import filedialog as fd
 from tkinter.filedialog import asksaveasfile
-#
+
+# END of drawing imports
 
 from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
 
 INF = float("inf")
+
 
 class GraphAlgo:
 
@@ -139,18 +142,13 @@ class GraphAlgo:
         @param id1: The start node id
         @param id2: The end node id
         @return: The distance of the path, a list of the nodes ids that the path goes through
-        Example:
-        # >>> from GraphAlgo import GraphAlgo
-        # >>> g_algo = GraphAlgo()
-        # >>> g_algo.addNode(0)
-        # >>> g_algo.addNode(1)
-        # >>> g_algo.addNode(2)
-        # >>> g_algo.addEdge(0,1,1)
-        # >>> g_algo.addEdge(1,2,4)
-        # >>> g_algo.shortestPath(0,1)
-        # (1, [0, 1])
-        # >>> g_algo.shortestPath(0,2)
-        # (5, [0, 1, 2])
+        Approach:
+        using a dictionary of each node distance from start node_id  and dictionary for previous updated node,
+        At first we init a dictionary to unvisited all nodes, and every time we visit one update it to visited so we want need to revist it.
+        each node is checked for its neighbours and calculates its distances while getting the best one we want.
+        Accumulating the distance for each node untill we reach dest node and we stop checking.
+        after that, in order to return the list of the nodes, we used deque to traverse backwards in our path using the 'previous node'
+        dictionary, by that we achieved saving the path from id1 - id2.
         Notes:
         If there is no path between id1 and id2, or one of them do not exist the function returns (float('inf'),[])
         More info:
@@ -230,7 +228,7 @@ class GraphAlgo:
         # return self.fixPath(node_lst, best_path), best_cost
 
     """
-    START of TSP helper functions
+        START of TSP helper functions
     """
 
     def cost(self, node, neighbour):
@@ -357,7 +355,7 @@ class GraphAlgo:
         return path
 
     """
-    END of TSP helper functions
+        END of TSP helper functions
     """
 
     def is_connected(self) -> bool:
@@ -413,7 +411,7 @@ class GraphAlgo:
         return node_id, min1
 
     """
-    From here an on all the methods relate to plot graph.
+        From here an on all the methods relate to plot graph.
     """
 
     def plot_graph(self) -> None:
@@ -436,6 +434,9 @@ class GraphAlgo:
         self.root.mainloop()
 
     def root_init(self) -> None:
+        """
+        This method init the matplotlib figure ( buttons, colors, locations... )
+        """
         fig = plt.figure(figsize=(20, 8), facecolor='gray', edgecolor='blue')
         self.ax = fig.subplots()  # for graph
         plt.subplots_adjust(left=0.2, bottom=0.1)
@@ -497,6 +498,9 @@ class GraphAlgo:
         self.root.deiconify()
 
     def load_graph(self) -> None:
+        """
+        This method responsible for the menu 'load_graph' tkinter button.
+        """
         filetypes = (
             ('json files', '*.json'),
             ('All files', '*.*')
@@ -507,6 +511,9 @@ class GraphAlgo:
         self.load_from_json(filename)
 
     def save_graph(self) -> None:
+        """
+        This method responsible for the menu 'save_graph' tkinter button.
+        """
         filetypes = (
             ('json files', '*.json'),
             ('All files', '*.*')
@@ -526,14 +533,21 @@ class GraphAlgo:
             start = [self.nodesX[k], self.nodesY[k]]
             for v in out_edge:
                 end = [self.nodesX[v], self.nodesY[v]]
-                plt.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]), arrowprops=dict(arrowstyle="->")) # reversed position
+                plt.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]),
+                             arrowprops=dict(arrowstyle="->"))  # reversed position
 
     def draw_center(self, event) -> None:
+        """
+        Private method responsible for showing the center in the graph.
+        """
         center = self.centerPoint()[0]
         self.ax.plot(self.nodesX[center], self.nodesY[center], markersize=6, marker='o', color='magenta')
         plt.show()
 
     def draw_sp(self, event) -> None:
+        """
+        Private method responsible for drawing the path between two id's
+        """
         data = eval(event)
         id1 = data[0]
         id2 = data[1]
@@ -548,6 +562,9 @@ class GraphAlgo:
         plt.show()
 
     def draw_cities(self, event) -> None:
+        """
+        Private method responsible for drawing the path between the id's ( cities )
+        """
         data = list(eval(event))
         path = list(self.TSP(data)[0])
         path.reverse()
@@ -561,18 +578,27 @@ class GraphAlgo:
         plt.show()
 
     def remove_node(self, event) -> None:
+        """
+        private remove node method
+        """
         data = eval(event)
         self.graph.remove_node(data)
         plt.close()
         self.root_init()
 
     def remove_edge(self, event) -> None:
+        """
+        private remove edge method
+        """
         data = eval(event)
         self.graph.remove_edge(data[0], data[1])
         plt.close()
         self.root_init()
 
     def add_node(self, event) -> None:
+        """
+        private add node method
+        """
         data = eval(event)
         pos = (data[1], data[2], 0)
         self.graph.add_node(data, pos)
@@ -580,6 +606,9 @@ class GraphAlgo:
         self.root_init()
 
     def add_edge(self, event) -> None:
+        """
+        private add edge method
+        """
         data = eval(event)
         self.graph.add_edge(data[0], data[1], data[2])
         plt.close()
@@ -621,19 +650,12 @@ class GraphAlgo:
             self.nodesY[curr_id] = int(y)
 
     def clear(self, event) -> None:
+        """
+        private clear plotlib figure method
+        """
         plt.close()
         self.root_init()
 
-
-if __name__ == '__main__':
-    nodes = {}
-    nodes = {}
-    tmp = DiGraph(nodes)
-    g = GraphAlgo(tmp)
-    # g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json")
-    g.load_from_json("C:/Users/yonar/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json")
-    # print(g.get_graph().all_out_edges_of_node(0))
-    # print(g.get_graph().all_out_edges_of_node(0)[5])
-    # print(g.shortest_path(5, 10))
-    # print(g.centerPoint())
-    g.plot_graph()
+    """
+        END of gui methods.
+    """
