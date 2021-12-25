@@ -36,25 +36,25 @@ For nearly every class there is an interface object in the api folder, which goe
 
 - ``` DiGraph implements GraphInterface```
 - ``` GraphAlgo implements GraphAlgoInterface```
-- ``` Node ``` 
+- ``` Node ``` : </br>
+this class represents a node and contains the node id and position, and dictionaries of edges coming in and out of the node ( seperately )
 - ``` main ```: </br>
 this class is used to by the course staff to check our implementation using the ``` check() ``` method ( which calls ``` check0() ... check3() ``` )
 
 ## How To use
+TODO
 
 ### If you're using PyCharm and scientific mode is on:
-it may interfere with the gui, if this happens please follow these [instructions](https://stackoverflow.com/questions/48384041/pycharm-how-to-remove-sciview)
+* it may interfere with the gui, if this happens please follow these [instructions](https://stackoverflow.com/questions/48384041/pycharm-how-to-remove-sciview)
 
 ## Lessons Learned
 ### things to improve
-- Better groundwork preparation
-- If we choose to use TDD than prepare tests before code 
-- More accurate tests
+- More advanced methods of work + algorithms ( striving for perfection )
 
 ### things to keep
 - Good source control
 - Proper divide of work
-- Keeping track of exercise additions and changes
+- K.I.S and then improve
 
 ## File Hierarchy
 ![image](https://user-images.githubusercontent.com/73063105/147392899-a9b84ab5-a327-4353-807f-ac2cf9e38d74.png)
@@ -66,5 +66,4 @@ it may interfere with the gui, if this happens please follow these [instructions
 - Dijkstra: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 - Graph Center: https://en.wikipedia.org/wiki/Graph_center
 - Travelling Salesman Problem (TSP): https://en.wikipedia.org/wiki/Travelling_salesman_problem
-- Gson library: https://github.com/google/gson
 - Heuristics https://en.wikipedia.org/wiki/Heuristic_(computer_science)
