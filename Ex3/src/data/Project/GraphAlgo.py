@@ -1,14 +1,18 @@
-import copy
 import json
-import math
-import random
-import sys
 import time
+import sys
 from collections import deque
 from typing import List
+
+# Drawing imports
+import tkinter
 import matplotlib.pyplot as plt
 from matplotlib.widgets import *
 from numpy.random import uniform
+from tkinter import *
+from tkinter import filedialog as fd
+from tkinter.filedialog import asksaveasfile
+#
 
 from Ex3.src.GraphInterface import GraphInterface
 from Ex3.src.data.Project.DiGraph import DiGraph
@@ -34,7 +38,9 @@ class GraphAlgo:
             self.graph = graph
         self.nodesX = {}
         self.nodesY = {}
+
         self.ax = None
+        self.root = Tk()
 
     """This abstract class represents an interface of a graph."""
 
@@ -122,8 +128,9 @@ class GraphAlgo:
                         'dest': node
                     })
         # open(file_name, "x")  # cant "wx" - meaning create (x) + write (w), but just "w" will create if needed!
-        json_file = open(file_name, "w")
+        json_file = open(str(file_name), "w")
         json_file.write(json.dumps(data, indent=4, ensure_ascii=False))
+        return True
         """
         Explanation on values passed to json.dumps():
         indent = 4  -  activates pretty print if an integer is passed
@@ -381,35 +388,98 @@ class GraphAlgo:
         Otherwise, they will be placed in a random but elegant manner.
         @return: None
         """
+        self.root.title("Graph Menu")
+        self.root.geometry("250x150")
+        self.root.eval('tk::PlaceWindow . center')
+        self.root.resizable(False, False)
+        show_graph = tkinter.Button(self.root, text="show graph", command=self.root_init, fg='black')
+        load_graph = tkinter.Button(self.root, text="load graph", command=self.load_graph, fg='blue')
+        save_graph = tkinter.Button(self.root, text="save graph", command=self.save_graph, fg='blue')
+        show_graph.pack()
+        load_graph.pack()
+        save_graph.pack()
+        self.root.mainloop()
+
+    def root_init(self) -> None:
         fig = plt.figure(figsize=(20, 8), facecolor='gray', edgecolor='blue')
         self.ax = fig.subplots()  # for graph
-        plt.subplots_adjust(left=0.35, bottom=0.1)
+        plt.subplots_adjust(left=0.2, bottom=0.1)
         self.update_x_y_pos()
         for k in self.nodesX:
             plt.plot(self.nodesX.get(k), self.nodesY.get(k), markersize=6, marker='o', color='blue')  # NODE
             plt.text(self.nodesX.get(k) + 10, self.nodesY.get(k) + 5, str(k), color='black', fontsize=10)  # ID
         self.draw_line_arrows()
-        plt.title('DW_Graph')
+        plt.title('Directed Weighted Graph')
         plt.ylabel('y-axis')
         plt.xlabel('x-axis')
         # button functionality
 
         # CENTER:
-        c_loc = plt.axes([0.2, 0.80, 0.1, 0.075])
-        c_b = Button(c_loc, label='Center', hovercolor='blue')
+        c_loc = plt.axes([0.04, 0.60, 0.1, 0.075])
+        c_b = plt.Button(c_loc, label='Center', hovercolor='blue')
         c_b.on_clicked(self.draw_center)
 
         # DIJKSTRA
-        box_loc = plt.axes([0.07, 0.80, 0.1, 0.075])
-        text_box = TextBox(box_loc, 'Shortest_Path', initial="Insert id1,id2")
+        box_loc = plt.axes([0.04, 0.80, 0.1, 0.075])
+        text_box = TextBox(box_loc, 'Dijkstra', initial="Insert id1,id2")
         text_box.on_submit(self.draw_sp)
 
+        # TSP
+        tsp_loc = plt.axes([0.04, 0.70, 0.1, 0.075])
+        tsp_box = TextBox(tsp_loc, 'TSP', initial="Insert cities")
+        tsp_box.on_submit(self.draw_cities)
+
         # Clear
-        clr_loc = plt.axes([0.07, 0.7, 0.1, 0.075])
-        clr_but = Button(clr_loc, label='Clear', hovercolor='blue')
+        clr_loc = plt.axes([0.04, 0.50, 0.1, 0.075])
+        clr_but = plt.Button(clr_loc, label='Clear', hovercolor='blue')
         clr_but.on_clicked(self.clear)
 
+        # Remove Node
+        rm_node = plt.axes([0.04, 0.40, 0.1, 0.075])
+        rm_node_box = TextBox(rm_node, ' Remove\nNode', initial="Insert id")
+        rm_node_box.on_submit(self.remove_node)
+
+        # Remove Edge
+        rm_edge = plt.axes([0.04, 0.30, 0.1, 0.075])
+        rm_edge_box = TextBox(rm_edge, ' Remove\nEdge', initial="Insert id1,id2")
+        rm_edge_box.on_submit(self.remove_edge)
+
+        # Add Node
+        add_node = plt.axes([0.04, 0.20, 0.1, 0.075])
+        add_node_box = TextBox(add_node, ' Add\nNode', initial="Insert id,x,y")
+        add_node_box.on_submit(self.add_node)
+
+        # Add Edge
+        add_edge = plt.axes([0.04, 0.10, 0.1, 0.075])
+        add_edge_box = TextBox(add_edge, ' Add\nEdge', initial="Insert id1,id2,w")
+        add_edge_box.on_submit(self.add_edge)
+
         plt.show()
+
+        while plt.fignum_exists(1):
+            self.root.withdraw()
+
+        self.root.deiconify()
+
+    def load_graph(self) -> None:
+        filetypes = (
+            ('json files', '*.json'),
+            ('All files', '*.*')
+        )
+        filename = fd.askopenfilename(title='Open a file',
+                                      initialdir='/../../PycharmProjects/DirectedWeigthedGraph_2/Ex3/data',
+                                      filetypes=filetypes)
+        self.load_from_json(filename)
+
+    def save_graph(self) -> None:
+        filetypes = (
+            ('json files', '*.json'),
+            ('All files', '*.*')
+        )
+        filename = fd.asksaveasfile(title="Save a file",
+                                    initialdir='/../../PycharmProjects/DirectedWeigthedGraph_2/Ex3/data',
+                                    filetypes=filetypes)
+        self.save_to_json(filename.name)
 
     def draw_line_arrows(self) -> None:
         """
@@ -421,12 +491,72 @@ class GraphAlgo:
             start = [self.nodesX[k], self.nodesY[k]]
             for v in out_edge:
                 end = [self.nodesX[v], self.nodesY[v]]
-                plt.annotate("", xy=(start[0], start[1]), xytext=(end[0], end[1]), arrowprops=dict(arrowstyle="->"))
+                plt.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]), arrowprops=dict(arrowstyle="->")) # reversed position
+
+    def draw_center(self, event) -> None:
+        center = self.centerPoint()[0]
+        self.ax.plot(self.nodesX[center], self.nodesY[center], markersize=6, marker='o', color='magenta')
+        plt.show()
+
+    def draw_sp(self, event) -> None:
+        data = eval(event)
+        id1 = data[0]
+        id2 = data[1]
+        path = list((self.shortest_path(id1, id2)[0]))
+        # print(path)
+        i = 0
+        for k in range(0, len(path)):
+            start = (self.nodesX[path[i]], self.nodesY[path.pop(i)])
+            end = (self.nodesX[path[i]], self.nodesY[path[i]])
+            self.ax.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]),
+                             arrowprops=dict(arrowstyle="fancy"))  # reversed position here because of arrow location
+        plt.show()
+
+    def draw_cities(self, event) -> None:
+        data = list(eval(event))
+        path = list(self.TSP(data)[0])
+        path.reverse()
+        i = 0
+        print(path)
+        for k in range(0, len(path)):
+            start = (self.nodesX[path[i]], self.nodesY[path.pop(i)])
+            end = (self.nodesX[path[i]], self.nodesY[path[i]])
+            self.ax.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]),
+                             arrowprops=dict(arrowstyle="fancy"))  # reversed position here because of arrow location
+        plt.show()
+
+    def remove_node(self, event) -> None:
+        data = eval(event)
+        self.graph.remove_node(data)
+        plt.close()
+        self.root_init()
+
+    def remove_edge(self, event) -> None:
+        data = eval(event)
+        self.graph.remove_edge(data[0], data[1])
+        plt.close()
+        self.root_init()
+
+    def add_node(self, event) -> None:
+        data = eval(event)
+        pos = (data[1], data[2], 0)
+        self.graph.add_node(data, pos)
+        plt.close()
+        self.root_init()
+
+    def add_edge(self, event) -> None:
+        data = eval(event)
+        self.graph.add_edge(data[0], data[1], data[2])
+        plt.close()
+        self.root_init()
 
     def update_x_y_pos(self) -> None:
         """
         private method that updates the positions of the nodes to fit correctly in the plot
         """
+        self.nodesY = {}
+        self.nodesX = {}
+
         minX = sys.float_info.max
         minY = sys.float_info.max
         maxX = sys.float_info.min
@@ -455,28 +585,9 @@ class GraphAlgo:
             self.nodesX[curr_id] = int(x)
             self.nodesY[curr_id] = int(y)
 
-    def draw_center(self, event) -> None:
-        center = self.centerPoint()[0]
-        self.ax.plot(self.nodesX[center], self.nodesY[center], markersize=6, marker='o', color='orange')
-        plt.show()
-
-    def draw_sp(self, event) -> None:
-        data = eval(event)
-        id1 = data[0]
-        id2 = data[1]
-        path = list((self.shortest_path(id1, id2)[0]))
-        print(path)
-        i = 0
-        for k in range(0, len(path)):
-            start = (self.nodesX[path[i]], self.nodesY[path.pop(i)])
-            end = (self.nodesX[path[i]], self.nodesY[path[i]])
-            self.ax.annotate("", xy=(end[0], end[1]), xytext=(start[0], start[1]),
-                             arrowprops=dict(arrowstyle="fancy"))  # reversed position here because of arrow location
-        plt.show()
-
     def clear(self, event) -> None:
         plt.close()
-        self.plot_graph()
+        self.root_init()
 
 
 if __name__ == '__main__':
@@ -487,6 +598,6 @@ if __name__ == '__main__':
     g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json")
     # print(g.get_graph().all_out_edges_of_node(0))
     # print(g.get_graph().all_out_edges_of_node(0)[5])
-    # print(g.shortest_path(0, 6))
+    # print(g.shortest_path(5, 10))
     # print(g.centerPoint())
     g.plot_graph()
