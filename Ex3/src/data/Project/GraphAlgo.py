@@ -269,6 +269,11 @@ class GraphAlgo:
         return best_neighbour
 
     def greedy_tsp(self, cities: list[int]) -> List[int]:
+        """
+        This method heuristically computes a path for a variation on the TSP problem ( can repeat visits)
+        :param cities: a list of nodes to visit
+        :return: an ordered path of nodes representing a heuristically best route
+        """
         curr_node = cities.pop()
         path = [curr_node]
 
@@ -284,11 +289,20 @@ class GraphAlgo:
                 path_to_rel.reverse()
                 path_to_rel.pop()
                 while path_to_rel:
-                    path.append(path_to_rel.pop())
+                    t = path_to_rel.pop()
+                    path.append(t)
+                    if t in cities:
+                        cities.remove(t)
+                    if len(cities) == 0:
+                        break
                 # to_visit.remove(min(to_visit))
                 continue  # fixed being stuck by plotting a path to a point in the list
 
-            curr_node = self.get_cheapest_neighbour(path[-1])  # get the cheapest neighbour of last element in the path.
+            try:
+                curr_node = self.get_cheapest_neighbour(path[-1])  # arr[-1] accesses last member of array
+            except:
+                curr_node = -1
+
             if curr_node in cities:
                 cities.remove(curr_node)
 
@@ -305,7 +319,12 @@ class GraphAlgo:
                 path_to_rel.reverse()
                 path_to_rel.pop()
                 while path_to_rel:
-                    path.append(path_to_rel.pop())
+                    t = path_to_rel.pop()
+                    path.append(t)
+                    if t in cities:
+                        cities.remove(t)
+                    if len(cities) == 0:
+                        break
                 # to_visit.remove(min(to_visit))
                 continue  # fixed being stuck by plotting a path to a point in the list
 
@@ -322,7 +341,12 @@ class GraphAlgo:
                     path_to_rel.reverse()
                     path_to_rel.pop()
                     while path_to_rel:
-                        path.append(path_to_rel.pop())
+                        t = path_to_rel.pop()
+                        path.append(t)
+                        if t in cities:
+                            cities.remove(t)
+                        if len(cities) == 0:
+                            break
                     # to_visit.remove(min(to_visit))
                     continue  # fixed being stuck by plotting a path to a point in the list
 
@@ -340,6 +364,23 @@ class GraphAlgo:
         private method that checks if the graph is strongly connected or not.
         :return: True if yes, false if not.
         """
+        all_nodes = self.get_graph().get_all_v()
+        for node in all_nodes:
+            if not self.BFS_Helper(node):
+                return False
+        return True
+
+    def BFS_Helper(self, node: int) -> bool:
+        visited = {node}
+        q = [node]
+        while q:
+            temp = q.pop()
+            edges = self.get_graph().all_out_edges_of_node(temp)
+            for edge in edges:
+                if edge not in visited:
+                    visited.add(edge)
+                    q.append(edge)
+        return len(visited) == len(self.get_graph().get_all_v())
 
     def centerPoint(self) -> (int, float):
         """
@@ -484,7 +525,8 @@ if __name__ == '__main__':
     nodes = {}
     tmp = DiGraph(nodes)
     g = GraphAlgo(tmp)
-    g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A0.json")
+    # g.load_from_json("/Users/Shaked/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json")
+    g.load_from_json("C:/Users/yonar/PycharmProjects/DirectedWeigthedGraph_2/Ex3/data/A5.json")
     # print(g.get_graph().all_out_edges_of_node(0))
     # print(g.get_graph().all_out_edges_of_node(0)[5])
     # print(g.shortest_path(0, 6))
