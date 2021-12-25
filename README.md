@@ -29,7 +29,7 @@ Using the dijkstra algorithm to calculate the sum of distances from each node th
 after that we simply iterate to find the node with the best average distance to every other node.
 - ``` tsp(List<NodeData> cities) ``` : </br>
 Firstly, TSP is an np-hard problem and thus difficult to find an accurate solution for, and in this exercise we were allowed to visit a city (node) more than once </br>
-Therefore we used a heuristic and greedy algorithm that *guarantees a solution* - for each node it reaches it chooses the lowest weight neighbour and if it detects a loop or gets stuck it calculates the shortest path from the current node to one of the nodes that were not visited yet using Dijkstra's algorithm, this approach tends to repeat some steps but this is traded for a guaranteed and feasible solution  </br>.
+Therefore we used a heuristic and greedy algorithm that *guarantees a solution* - for each node it reaches it chooses the lowest weight neighbour and if it detects a loop or gets stuck it calculates the shortest path from the current node to one of the nodes that were not visited yet using Dijkstra's algorithm, this approach tends to repeat some steps but this is traded for a guaranteed and feasible solution.  </br>
 
 ## The Classes
 For nearly every class there is an interface object in the api folder, which goes into detail about the methods the classes must have and what they do, so unless it's not stated somewhere we will not elaborate
