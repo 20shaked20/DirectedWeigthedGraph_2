@@ -42,10 +42,14 @@ this class represents a node and contains the node id and position, and dictiona
 this class is used to by the course staff to check our implementation using the ``` check() ``` method ( which calls ``` check0() ... check3() ``` )
 
 ## How To use
-TODO
+Please see the wiki for instructions on how to use our GUI.
 
 ### If you're using PyCharm and scientific mode is on:
 * it may interfere with the gui, if this happens please follow these [instructions](https://stackoverflow.com/questions/48384041/pycharm-how-to-remove-sciview)
+
+## dependencies
+
+``` MatPlotLib ```  - install with ``` python3 -m pip install matplotlib ``` or equivalent.
 
 ## Lessons Learned
 ### things to improve
