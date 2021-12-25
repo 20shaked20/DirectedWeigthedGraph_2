@@ -23,10 +23,9 @@ Despite this we felt the need to improve on our TSP solution and experimented wi
 We will not go into the heavy depths of each algorithm, but rather describe what solution we used. </br>
 
 - ``` shortestPath(int src, int dest) ``` and ``` shortestPathDist(int src, int dest) ``` : </br>
-Using the dijkstra algorithm we managed to get accurate results in ``` O(|V| * (|E| + |V|)) ```, using the pseudo-code located in the wiki page as a guideline for implementation and private properties of nodes such as tag, info, and weight.
+Using the dijkstra algorithm we managed to get accurate results in ``` O(|V| * (|E| + |V|)) ```, using the pseudo-code located in the wikipedia page as a guideline for implementation
 - ``` center() ``` : </br>
-Using the dijkstra algorithm to calculate the sum of distances from each node the every other one, and then dividing by the amount of nodes to get an average. </br>
-after that we simply iterate to find the node with the best average distance to every other node.
+Using the dijkstra algorithm to calculate the maximum distance possible from every node, and then taking the node withe the minimal max distance - that is, the node who's longest route is the shortest of all nodes
 - ``` tsp(List<NodeData> cities) ``` : </br>
 Firstly, TSP is an np-hard problem and thus difficult to find an accurate solution for, and in this exercise we were allowed to visit a city (node) more than once </br>
 Therefore we used a heuristic and greedy algorithm that *guarantees a solution* - for each node it reaches it chooses the lowest weight neighbour and if it detects a loop or gets stuck it calculates the shortest path from the current node to one of the nodes that were not visited yet using Dijkstra's algorithm, this approach tends to repeat some steps but this is traded for a guaranteed and feasible solution.  </br>
