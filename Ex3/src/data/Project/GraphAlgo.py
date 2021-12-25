@@ -15,12 +15,6 @@ from Ex3.src.data.Project.DiGraph import DiGraph
 
 INF = float("inf")
 
-
-# TODO:
-#   John to_do:
-#  1. create is connected
-#  2. finish tests
-
 class GraphAlgo:
 
     def __init__(self, graph: GraphInterface = None):  # actually its DiGraph.
