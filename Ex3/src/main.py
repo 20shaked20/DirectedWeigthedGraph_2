@@ -18,10 +18,10 @@ def check():
     (7, 6.806805834715163)
     ([1,3,4,2],3.5)
     """
-    # check0()
-    # check1()
-    # check2()
-    # check3()
+    check0()
+    check1()
+    check2()
+    check3()
 
 
 def check0():
@@ -59,7 +59,7 @@ def check1():
     print(g_algo.shortest_path(0, 3))
     print(g_algo.shortest_path(3, 1))
     print(g_algo.centerPoint())
-    # g_algo.save_to_json(file + '_saved')
+    g_algo.save_to_json(file + '_saved')
     g_algo.plot_graph()
 
 

@@ -20,8 +20,6 @@ INF = float("inf")
 #   John to_do:
 #  1. create is connected
 #  2. finish tests
-#  3. FIX THE TSP, -> cannot run on main.py
-#  4. SAVE is not working at all in the "main.py"
 
 class GraphAlgo:
 
@@ -94,7 +92,8 @@ class GraphAlgo:
         for node in all_nodes:
             # key_list = list(all_nodes.keys())
             val_list = list(all_nodes.values())
-            pos = '' + val_list[node][0] + ',' + val_list[node][1] + ',' + val_list[node][2] + ''
+            # print(val_list[node][0], ',' + val_list[node][1], ',', val_list[node][2])
+            pos = str(val_list[node][0]) + ',' + str(val_list[node][1]) + ',' + str(val_list[node][2])
             data["Nodes"].append({
                 'pos': pos,
                 'id': node
@@ -104,7 +103,7 @@ class GraphAlgo:
             key_list = list(edges.keys())
             val_list = list(edges.values())
             for edge in edges:
-                if not (edge in data["Edges"]):  # TODO: is this the correct check?
+                if not (edge in data["Edges"]):
                     data["Edges"].append({
                         'src': node,
                         'w': val_list[key_list.index(edge)],
@@ -116,13 +115,13 @@ class GraphAlgo:
             key_list = list(edges.keys())
             val_list = list(edges.values())
             for edge in edges:
-                if not (edge in data["Edges"]):  # TODO: duplicate, is this the correct check?
+                if not (edge in data["Edges"]):
                     data["Edges"].append({
                         'src': edge,
                         'w': val_list[key_list.index(edge)],
                         'dest': node
                     })
-        # open(file_name, "x")
+        # open(file_name, "x")  # cant "wx" - meaning create (x) + write (w), but just "w" will create if needed!
         json_file = open(file_name, "w")
         json_file.write(json.dumps(data, indent=4, ensure_ascii=False))
         """
@@ -225,7 +224,7 @@ class GraphAlgo:
         temp_path = copy.deepcopy(best_path)
         best_cost = self.path_weight(temp_path)
         end_time = time.time()
-        print("Approximated a solution for TSP in:", end_time - start_time, "seconds with weight:", best_cost)
+        # print("Approximated a solution for TSP in:", end_time - start_time, "seconds with weight:", best_cost)
         return best_path, best_cost
         # return self.fixPath(node_lst, best_path), best_cost
 
@@ -322,10 +321,7 @@ class GraphAlgo:
                     path_to_rel: list = path_to_rel[0]  # this is a deque object
                     path_to_rel.reverse()
                     path_to_rel.pop()
-                    print(path_to_rel)
-                    path_to_rel
                     while path_to_rel:
-                        # path.append(path_to_rel.popleft())
                         path.append(path_to_rel.pop())
                     # to_visit.remove(min(to_visit))
                     continue  # fixed being stuck by plotting a path to a point in the list
