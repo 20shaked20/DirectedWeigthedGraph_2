@@ -3,6 +3,9 @@
 This is a repository of DirectedWeightedGraph as part of an assignment in Ariel University 
 </br>
 
+* Shaked's github(https://github.com/20shaked20)
+* Yonatan's github(https://github.com/Teklar223)
+
 ## Introduction
 - If you just want to know how to use this code please skip to the ``` How To Use ``` segment below.
 - If you want to know how to work with the gui, we've dedictated a wiki page for it.
