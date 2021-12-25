@@ -59,7 +59,7 @@ class GraphAlgo:
                 nodes = _dict["Nodes"]
 
                 # NODE Creation:
-                xyz_tuple = None # standard position
+                xyz_tuple = None  # standard position
                 key = "pos"
                 for k in nodes:
                     if key in k:
@@ -220,6 +220,8 @@ class GraphAlgo:
         """
         start_time = time.time()
         best_path = self.greedy_tsp(node_lst)
+        if best_path is None:
+            return None, -1
         temp_path = copy.deepcopy(best_path)
         best_cost = self.path_weight(temp_path)
         end_time = time.time()
@@ -274,12 +276,16 @@ class GraphAlgo:
         while len(cities) > 0:
 
             if len(cities) == 1:
-                temp = self.shortest_path(path[-1], cities.pop())
+                last_city = cities.pop()
+                temp = self.shortest_path(path[-1], last_city)
+                if temp[0] == INF:
+                    return None
                 path_to_rel = tuple(temp)
                 path_to_rel = path_to_rel[0]
-                path_to_rel.popleft()
+                path_to_rel.reverse()
+                path_to_rel.pop()
                 while path_to_rel:
-                    path.append(path_to_rel.popleft())
+                    path.append(path_to_rel.pop())
                 # to_visit.remove(min(to_visit))
                 continue  # fixed being stuck by plotting a path to a point in the list
 
@@ -293,11 +299,14 @@ class GraphAlgo:
 
             if curr_node == -1:
                 temp = self.shortest_path(path[-1], cities.pop())
+                if temp[0] == INF:
+                    return None
                 path_to_rel = tuple(temp)
                 path_to_rel = path_to_rel[0]
-                path_to_rel.popleft()
+                path_to_rel.reverse()
+                path_to_rel.pop()
                 while path_to_rel:
-                    path.append(path_to_rel.popleft())
+                    path.append(path_to_rel.pop())
                 # to_visit.remove(min(to_visit))
                 continue  # fixed being stuck by plotting a path to a point in the list
 
@@ -306,11 +315,18 @@ class GraphAlgo:
             if len(path) >= 2:
                 if path[-2] == curr_node:  # if we detect a loop, or we are stuck
                     # path_to_rel = self.shortest_path(path[-1], cities.pop())
-                    path_to_rel = tuple(self.shortest_path(path[-1], cities.pop()))
-                    path_to_rel: deque = path_to_rel[0]  # this is a deque object
-                    path_to_rel.popleft()
+                    temp = self.shortest_path(path[-1], cities.pop())
+                    if temp[0] == INF:
+                        return None
+                    path_to_rel = tuple(temp)
+                    path_to_rel: list = path_to_rel[0]  # this is a deque object
+                    path_to_rel.reverse()
+                    path_to_rel.pop()
+                    print(path_to_rel)
+                    path_to_rel
                     while path_to_rel:
-                        path.append(path_to_rel.popleft())
+                        # path.append(path_to_rel.popleft())
+                        path.append(path_to_rel.pop())
                     # to_visit.remove(min(to_visit))
                     continue  # fixed being stuck by plotting a path to a point in the list
 
