@@ -3,8 +3,8 @@
 This is a repository of DirectedWeightedGraph as part of an assignment in Ariel University 
 </br>
 
-* Shaked's github(https://github.com/20shaked20)
-* Yonatan's github(https://github.com/Teklar223)
+* [Shaked's github](https://github.com/20shaked20)
+* [Yonatan's github](https://github.com/Teklar223)
 
 ## Introduction
 - If you just want to know how to use this code please skip to the ``` How To Use ``` segment below.
@@ -14,7 +14,7 @@ In this assignment we are expected to construct and implement solutions to known
 
 ## Approach
 
-This assignment is essentially a "copy" of this(https://github.com/20shaked20/DirectedWeightedGraph) but in python, the idea is for us to familiarize ourselves with the workings of both java and python and as such we didnt have to think too hard on the algorithms, but rather on the implementation differences in python vs in java.</br>
+This assignment is essentially a "copy" of [this assignment](https://github.com/20shaked20/DirectedWeightedGraph) but in python, the idea is for us to familiarize ourselves with the workings of both java and python and as such we didnt have to think too hard on the algorithms, but rather on the implementation differences in python vs in java.</br>
 
 Despite this we felt the need to improve on our TSP solution and experimented with different algorithms, one such attempted solution was with Simulated Annealing - a basic machine learning algorithm, unfortunetly this attempt was flawed, and due to to time restrictions we decided to use a more naive and simple approach, a greedy algorithm that guarantee's (heuristically) a feasible solution.
  </br>
@@ -43,7 +43,7 @@ this class is used to by the course staff to check our implementation using the 
 ## How To use
 
 ### If you're using PyCharm and scientific mode is on:
-it may interfere with the gui, if this happens please follow these(https://stackoverflow.com/questions/48384041/pycharm-how-to-remove-sciview) instructions
+it may interfere with the gui, if this happens please follow these [instructions](https://stackoverflow.com/questions/48384041/pycharm-how-to-remove-sciview)
 
 ## Lessons Learned
 ### things to improve
@@ -57,6 +57,8 @@ it may interfere with the gui, if this happens please follow these(https://stack
 - Keeping track of exercise additions and changes
 
 ## File Hierarchy
+![image](https://user-images.githubusercontent.com/73063105/147392899-a9b84ab5-a327-4353-807f-ac2cf9e38d74.png)
+
 
 ## Reading Material
 - About Directed, Weighted, and Directed + Weighted graphs: http://math.oxford.emory.edu/site/cs171/directedAndEdgeWeightedGraphs/
