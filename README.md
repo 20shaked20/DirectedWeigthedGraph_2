@@ -70,3 +70,4 @@ Please see the wiki for instructions on how to use our GUI.
 - Graph Center: https://en.wikipedia.org/wiki/Graph_center
 - Travelling Salesman Problem (TSP): https://en.wikipedia.org/wiki/Travelling_salesman_problem
 - Heuristics https://en.wikipedia.org/wiki/Heuristic_(computer_science)
+- https://stackoverflow.com/questions/1436703/what-is-the-difference-between-str-and-repr
