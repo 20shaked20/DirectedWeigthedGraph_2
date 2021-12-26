@@ -3,6 +3,8 @@ from numpy.random import uniform
 from Ex3.src.data.Project.Node import Node
 
 
+# TODO: repr for DiGraph
+
 class DiGraph:
 
     def __init__(self, nodes: dict = None) -> None:
@@ -142,3 +144,13 @@ class DiGraph:
             del nod1.all_edges_out_dict()[node_id2]
             del nod2.all_edges_in_dict()[node_id1]
         return True
+
+    def __repr__(self):
+        nodes = self.get_all_v()
+        printout = ""
+        for k in nodes:
+            dict_ = ("Node ID:", k
+                     , "EDGES OUT:", self.nodes[k].all_edges_out_dict(),
+                     "EDGES IN:", self.nodes[k].all_edges_in_dict())
+            printout += str(dict_) + "\n"
+        return printout

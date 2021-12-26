@@ -386,29 +386,32 @@ class GraphAlgo:
         Finds the node that has the shortest distance to it's farthest node.
         :return: The node id, min-maximum distance
         """
-        min1 = sys.float_info.max
-        node_id = -1
-        for k in self.get_graph().get_all_v():
-            curr_node = k
-            max1 = sys.float_info.min
-            for v in self.get_graph().get_all_v():
-                if v == k:  # same node, no need to check again.
-                    continue
-                next_node = v
-                tmp_dijk = self.shortest_path(curr_node, next_node)
-                tmp = tmp_dijk[1]
-                if tmp_dijk[0] is not INF:
-                    if tmp > max1:
-                        max1 = tmp
-                    if tmp > min1:
-                        # we want Minimum of all maximums
-                        break
+        if self.is_connected():
+            min1 = sys.float_info.max
+            node_id = -1
+            for k in self.get_graph().get_all_v():
+                curr_node = k
+                max1 = sys.float_info.min
+                for v in self.get_graph().get_all_v():
+                    if v == k:  # same node, no need to check again.
+                        continue
+                    next_node = v
+                    tmp_dijk = self.shortest_path(curr_node, next_node)
+                    tmp = tmp_dijk[1]
+                    if tmp_dijk[0] is not INF:
+                        if tmp > max1:
+                            max1 = tmp
+                        if tmp > min1:
+                            # we want Minimum of all maximums
+                            break
 
-            if min1 > max1:
-                min1 = max1
-                node_id = k
+                if min1 > max1:
+                    min1 = max1
+                    node_id = k
 
-        return node_id, min1
+            return node_id, min1
+        else:
+            return False
 
     """
         From here an on all the methods relate to plot graph.
@@ -509,6 +512,8 @@ class GraphAlgo:
                                       initialdir='/../../PycharmProjects/DirectedWeigthedGraph_2/Ex3/data',
                                       filetypes=filetypes)
         self.load_from_json(filename)
+        self.root.withdraw()
+        self.root_init()
 
     def save_graph(self) -> None:
         """
@@ -541,7 +546,7 @@ class GraphAlgo:
         Private method responsible for showing the center in the graph.
         """
         center = self.centerPoint()[0]
-        self.ax.plot(self.nodesX[center], self.nodesY[center], markersize=6, marker='o', color='magenta')
+        self.ax.plot(self.nodesX[center], self.nodesY[center], markersize=10, marker='o', color='magenta')
         plt.show()
 
     def draw_sp(self, event) -> None:
